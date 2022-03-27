@@ -39,7 +39,10 @@ void timer_callback(void)
 		
 }
 */
-;variable globale
+;variable 
+;
+;
+
 import FlagCligno
 
 timer_callback proc
