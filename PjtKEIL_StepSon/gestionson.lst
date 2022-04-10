@@ -100,7 +100,7 @@ ARM Macro Assembler    Page 2
    20 00000008         
    21 00000008         
    22 00000008         
-   23 00000008         
+   23 00000008         ;callbackson algorithme 
    24 00000008         ;si(index<longueur)
    25 00000008         ;Rx=son[(indice+32767)/92]
    26 00000008         ;indice++
@@ -109,61 +109,62 @@ ARM Macro Assembler    Page 2
    29 00000008         
    30 00000008         ;Section ROM code (read only) :  
    31 00000008                 area             moncode,code,readonly
-   32 00000000         StartSon
+   32 00000000         ;StartSon proc
+   33 00000000         ; ldr r0,=index
+   34 00000000         ; mov r1,#0
+   35 00000000         ; str r1,[r0]
+   36 00000000         ; ENDP
+   37 00000000         
+   38 00000000         ; écrire le code ici  
+   39 00000000         CallbackSon
                                proc
-   33 00000000 480F            ldr              r0,=index
-   34 00000002 F04F 0100       mov              r1,#0
-   35 00000006 6001            str              r1,[r0]
-   36 00000008                 ENDP
-   37 00000008         
-   38 00000008         ; écrire le code ici  
-   39 00000008         CallbackSon
-                               proc
-   40 00000008 B570            push             {lr,r4,r5,r6}
-   41 0000000A 4C0E            ldr              r4,=LongueurSon
-   42 0000000C 6823            ldr              r3,[r4]     ; r1;val longueurSo
+   40 00000000 B570            push             {lr,r4,r5,r6}
+   41 00000002 4C0D            ldr              r4,=LongueurSon
+   42 00000004 6823            ldr              r3,[r4]     ; r1;val longueurSo
                                                             n
-   43 0000000E 4C0C            ldr              r4 , =index ; r4 @index
-   44 00000010 6822            ldr              r2,[r4]     ;r2 val index 
-   45 00000012 4293            cmp              r3,r2       ; comparaison de in
+   43 00000006 4C0D            ldr              r4 , =index ; r4 @index
+   44 00000008 6822            ldr              r2,[r4]     ;r2 val index 
+   45 0000000A 4293            cmp              r3,r2       ; comparaison de in
                                                             dex et LongueurSon 
                                                             
+   46 0000000C D011            beq              Next        ; si index > longue
 
 
 
 ARM Macro Assembler    Page 3 
 
 
-   46 00000014 D011            beq              Next        ; si index > longue
                                                             urSonpsser a Next 
-   47 00000016         
-   48 00000016 490C            ldr              r1,= Son    ; recup de @ son
-   49 00000018 F931 0012       ldrsh            r0,[r1,r2,lsl #1] ;echanti
-   50 0000001C 4D0B            ldr              r5,=SortieSon
-   51 0000001E         ; mise a l echelle
-   52 0000001E F500 4000       add              r0, #32768
-   53 00000022 F44F 7634       mov              r6, #720
-   54 00000026 FB00 F006       mul              r0, r0, r6
-   55 0000002A EA4F 4020       asr              r0,#16
-   56 0000002E 6028            str              r0,[r5]
-   57 00000030         ;push {R2}
-   58 00000030 F7FF FFFE       bl               PWM_Set_Value_TIM3_Ch3
-   59 00000034         ;pop {R2} 
-   60 00000034 F102 0201       add              r2,r2,#1    ;incrementation d'i
+   47 0000000E         
+   48 0000000E 490C            ldr              r1,= Son    ; recup de @ son
+   49 00000010 F931 0012       ldrsh            r0,[r1,r2,lsl #1] ;echanti
+   50 00000014 4D0B            ldr              r5,=SortieSon
+   51 00000016         ; mise a l echelle
+   52 00000016 F500 4000       add              r0, #32768
+   53 0000001A F44F 7634       mov              r6, #720
+   54 0000001E FB00 F006       mul              r0, r0, r6
+   55 00000022 EA4F 4020       asr              r0,#16
+   56 00000026 6028            str              r0,[r5]
+   57 00000028         ;push {R2}
+   58 00000028 F7FF FFFE       bl               PWM_Set_Value_TIM3_Ch3 ; mettre
+                                                             à jour le rapport 
+                                                            cyclique  
+   59 0000002C         ;pop {R2} 
+   60 0000002C F102 0201       add              r2,r2,#1    ;incrementation d'i
                                                             ndex
-   61 00000038 6022            str              r2,[r4]
-   62 0000003A         ;b Fin
-   63 0000003A         
-   64 0000003A         Next
-   65 0000003A         
-   66 0000003A         
-   67 0000003A E8BD 4070       pop{lr,r4,r5,r6}
-   68 0000003E         
-   69 0000003E 4770            bx               lr
-   70 00000040         
-   71 00000040                 ENDP
-   72 00000040         
-   73 00000040                 END
+   61 00000030 6022            str              r2,[r4]
+   62 00000032         ;b Fin
+   63 00000032         
+   64 00000032         Next
+   65 00000032         
+   66 00000032         
+   67 00000032 E8BD 4070       pop{lr,r4,r5,r6}
+   68 00000036         
+   69 00000036 4770            bx               lr
+   70 00000038         
+   71 00000038                 ENDP
+   72 00000038         
+   73 00000038                 END
               00000000 
               00000000 
               00000000 
@@ -212,7 +213,6 @@ Symbol: index
       At line 17 in file Src\GestionSon.s
    Uses
       At line 8 in file Src\GestionSon.s
-      At line 33 in file Src\GestionSon.s
       At line 43 in file Src\GestionSon.s
 
 maram 00000000
@@ -230,7 +230,7 @@ Comment: maram unused
 ARM Macro Assembler    Page 1 Alphabetic symbol ordering
 Relocatable symbols
 
-CallbackSon 00000008
+CallbackSon 00000000
 
 Symbol: CallbackSon
    Definitions
@@ -238,7 +238,7 @@ Symbol: CallbackSon
    Uses
       At line 6 in file Src\GestionSon.s
 Comment: CallbackSon used once
-Next 0000003A
+Next 00000032
 
 Symbol: Next
    Definitions
@@ -246,14 +246,6 @@ Symbol: Next
    Uses
       At line 46 in file Src\GestionSon.s
 Comment: Next used once
-StartSon 00000000
-
-Symbol: StartSon
-   Definitions
-      At line 32 in file Src\GestionSon.s
-   Uses
-      None
-Comment: StartSon unused
 moncode 00000000
 
 Symbol: moncode
@@ -262,7 +254,7 @@ Symbol: moncode
    Uses
       None
 Comment: moncode unused
-4 symbols
+3 symbols
 
 
 
@@ -348,4 +340,4 @@ Symbol: Son
       At line 48 in file Src\GestionSon.s
 Comment: Son used once
 9 symbols
-354 symbols in table
+353 symbols in table

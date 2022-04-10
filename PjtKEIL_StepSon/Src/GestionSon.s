@@ -20,7 +20,7 @@ index dcd 0
 	
 
 
-
+;callbackson algorithme 
 ;si(index<longueur)
 ;Rx=son[(indice+32767)/92]
 ;indice++
@@ -29,6 +29,7 @@ index dcd 0
 		
 ;Section ROM code (read only) :		
 	area    moncode,code,readonly
+;fonction StartSon qui permet de lancer la séquence sonore
 StartSon proc
 	ldr r0,=index
 	mov r1,#0
@@ -55,7 +56,7 @@ CallbackSon proc
 	asr r0,#16
 	str r0,[r5]
 	;push {R2}
-	bl PWM_Set_Value_TIM3_Ch3
+	bl PWM_Set_Value_TIM3_Ch3    ; mettre à jour le rapport cyclique  
 	;pop {R2} 
 	add r2,r2,#1   ;incrementation d'index
 	str r2,[r4]
