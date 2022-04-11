@@ -1,6 +1,6 @@
 	PRESERVE8
 	THUMB   
-		
+	import LeSignal
 
 ; ====================== zone de réservation de données,  ======================================
 ;Section RAM (read only) :
@@ -20,7 +20,14 @@
 ;Section ROM code (read only) :		
 	area    moncode,code,readonly
 ; écrire le code ici		
-
+DFT_ModuleAuCarre PROC
+	push{lr,r4}
+	ldr r4,=LeSignal  ; l'@ de LeSignal
+	ldr r3,[r4]
+	mov r2,#0x00   ; initialisation de la variable i 
+	ldrsh r1,[r3,r2,lsl #1]
+	add r2,
+	
 
 
 
