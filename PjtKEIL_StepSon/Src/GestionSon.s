@@ -55,9 +55,9 @@ CallbackSon proc
 	mul r0, r0, r6
 	asr r0,#16
 	str r0,[r5]
-	;push {R2}
+	push {R2}
 	bl PWM_Set_Value_TIM3_Ch3    ; mettre à jour le rapport cyclique  
-	;pop {R2} 
+	pop {R2} 
 	add r2,r2,#1   ;incrementation d'index
 	str r2,[r4]
 	;b Fin

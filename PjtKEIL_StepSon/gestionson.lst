@@ -109,73 +109,76 @@ ARM Macro Assembler    Page 2
    29 00000008         
    30 00000008         ;Section ROM code (read only) :  
    31 00000008                 area             moncode,code,readonly
-   32 00000000         ;StartSon proc
-   33 00000000         ; ldr r0,=index
-   34 00000000         ; mov r1,#0
-   35 00000000         ; str r1,[r0]
-   36 00000000         ; ENDP
-   37 00000000         
-   38 00000000         ; écrire le code ici  
-   39 00000000         CallbackSon
+   32 00000000         ;fonction StartSon qui permet de lancer la séquence sono
+                       re
+   33 00000000         StartSon
                                proc
-   40 00000000 B570            push             {lr,r4,r5,r6}
-   41 00000002 4C0D            ldr              r4,=LongueurSon
-   42 00000004 6823            ldr              r3,[r4]     ; r1;val longueurSo
+   34 00000000 4810            ldr              r0,=index
+   35 00000002 F04F 0100       mov              r1,#0
+   36 00000006 6001            str              r1,[r0]
+   37 00000008                 ENDP
+   38 00000008         
+   39 00000008         ; écrire le code ici  
+   40 00000008         CallbackSon
+                               proc
+   41 00000008 B570            push             {lr,r4,r5,r6}
+   42 0000000A 4C0F            ldr              r4,=LongueurSon
+   43 0000000C 6823            ldr              r3,[r4]     ; r1;val longueurSo
                                                             n
-   43 00000006 4C0D            ldr              r4 , =index ; r4 @index
-   44 00000008 6822            ldr              r2,[r4]     ;r2 val index 
-   45 0000000A 4293            cmp              r3,r2       ; comparaison de in
-                                                            dex et LongueurSon 
-                                                            
-   46 0000000C D011            beq              Next        ; si index > longue
+   44 0000000E 4C0D            ldr              r4 , =index ; r4 @index
+   45 00000010 6822            ldr              r2,[r4]     ;r2 val index 
+   46 00000012 4293            cmp              r3,r2       ; comparaison de in
 
 
 
 ARM Macro Assembler    Page 3 
 
 
+                                                            dex et LongueurSon 
+                                                            
+   47 00000014 D013            beq              Next        ; si index > longue
                                                             urSonpsser a Next 
-   47 0000000E         
-   48 0000000E 490C            ldr              r1,= Son    ; recup de @ son
-   49 00000010 F931 0012       ldrsh            r0,[r1,r2,lsl #1] ;echanti
-   50 00000014 4D0B            ldr              r5,=SortieSon
-   51 00000016         ; mise a l echelle
-   52 00000016 F500 4000       add              r0, #32768
-   53 0000001A F44F 7634       mov              r6, #720
-   54 0000001E FB00 F006       mul              r0, r0, r6
-   55 00000022 EA4F 4020       asr              r0,#16
-   56 00000026 6028            str              r0,[r5]
-   57 00000028         ;push {R2}
-   58 00000028 F7FF FFFE       bl               PWM_Set_Value_TIM3_Ch3 ; mettre
+   48 00000016         
+   49 00000016 490D            ldr              r1,= Son    ; recup de @ son
+   50 00000018 F931 0012       ldrsh            r0,[r1,r2,lsl #1] ;echanti
+   51 0000001C 4D0C            ldr              r5,=SortieSon
+   52 0000001E         ; mise a l echelle
+   53 0000001E F500 4000       add              r0, #32768
+   54 00000022 F44F 7634       mov              r6, #720
+   55 00000026 FB00 F006       mul              r0, r0, r6
+   56 0000002A EA4F 4020       asr              r0,#16
+   57 0000002E 6028            str              r0,[r5]
+   58 00000030 B404            push             {R2}
+   59 00000032 F7FF FFFE       bl               PWM_Set_Value_TIM3_Ch3 ; mettre
                                                              à jour le rapport 
                                                             cyclique  
-   59 0000002C         ;pop {R2} 
-   60 0000002C F102 0201       add              r2,r2,#1    ;incrementation d'i
+   60 00000036 BC04            pop              {R2}
+   61 00000038 F102 0201       add              r2,r2,#1    ;incrementation d'i
                                                             ndex
-   61 00000030 6022            str              r2,[r4]
-   62 00000032         ;b Fin
-   63 00000032         
-   64 00000032         Next
-   65 00000032         
-   66 00000032         
-   67 00000032 E8BD 4070       pop{lr,r4,r5,r6}
-   68 00000036         
-   69 00000036 4770            bx               lr
-   70 00000038         
-   71 00000038                 ENDP
-   72 00000038         
-   73 00000038                 END
+   62 0000003C 6022            str              r2,[r4]
+   63 0000003E         ;b Fin
+   64 0000003E         
+   65 0000003E         Next
+   66 0000003E         
+   67 0000003E         
+   68 0000003E E8BD 4070       pop{lr,r4,r5,r6}
+   69 00000042         
+   70 00000042 4770            bx               lr
+   71 00000044         
+   72 00000044                 ENDP
+   73 00000044         
+   74 00000044                 END
               00000000 
               00000000 
               00000000 
               00000000 
 Command Line: --debug --xref --diag_suppress=9931 --cpu=Cortex-M3 --apcs=interw
-ork --depend=.\obj\gestionson.d -o.\obj\gestionson.o -I.\Driver -I.\RTE\_Simu -
-IC:\Programdata\Keil\Arm\Packs\ARM\CMSIS\5.7.0\CMSIS\Core\Include -IC:\Programd
-ata\Keil\Arm\Packs\Keil\STM32F1xx_DFP\2.3.0\Device\Include --predefine="__EVAL 
-SETA 1" --predefine="__MICROLIB SETA 1" --predefine="__UVISION_VERSION SETA 534
-" --predefine="_RTE_ SETA 1" --predefine="STM32F10X_MD SETA 1" --predefine="_RT
-E_ SETA 1" --list=gestionson.lst Src\GestionSon.s
+ork --depend=.\obj\gestionson.d -o.\obj\gestionson.o -I.\Driver -I.\RTE\_CibleS
+ondeKEIL -IC:\Programdata\Keil\Arm\Packs\ARM\CMSIS\5.7.0\CMSIS\Core\Include -IC
+:\Programdata\Keil\Arm\Packs\Keil\STM32F1xx_DFP\2.3.0\Device\Include --predefin
+e="__EVAL SETA 1" --predefine="__MICROLIB SETA 1" --predefine="__UVISION_VERSIO
+N SETA 534" --predefine="_RTE_ SETA 1" --predefine="STM32F10X_MD SETA 1" --pred
+efine="_RTE_ SETA 1" --list=gestionson.lst Src\GestionSon.s
 
 
 
@@ -204,7 +207,7 @@ Symbol: SortieSon
       At line 16 in file Src\GestionSon.s
    Uses
       At line 7 in file Src\GestionSon.s
-      At line 50 in file Src\GestionSon.s
+      At line 51 in file Src\GestionSon.s
 
 index 00000004
 
@@ -213,7 +216,8 @@ Symbol: index
       At line 17 in file Src\GestionSon.s
    Uses
       At line 8 in file Src\GestionSon.s
-      At line 43 in file Src\GestionSon.s
+      At line 34 in file Src\GestionSon.s
+      At line 44 in file Src\GestionSon.s
 
 maram 00000000
 
@@ -230,22 +234,30 @@ Comment: maram unused
 ARM Macro Assembler    Page 1 Alphabetic symbol ordering
 Relocatable symbols
 
-CallbackSon 00000000
+CallbackSon 00000008
 
 Symbol: CallbackSon
    Definitions
-      At line 39 in file Src\GestionSon.s
+      At line 40 in file Src\GestionSon.s
    Uses
       At line 6 in file Src\GestionSon.s
 Comment: CallbackSon used once
-Next 00000032
+Next 0000003E
 
 Symbol: Next
    Definitions
-      At line 64 in file Src\GestionSon.s
+      At line 65 in file Src\GestionSon.s
    Uses
-      At line 46 in file Src\GestionSon.s
+      At line 47 in file Src\GestionSon.s
 Comment: Next used once
+StartSon 00000000
+
+Symbol: StartSon
+   Definitions
+      At line 33 in file Src\GestionSon.s
+   Uses
+      None
+Comment: StartSon unused
 moncode 00000000
 
 Symbol: moncode
@@ -254,7 +266,7 @@ Symbol: moncode
    Uses
       None
 Comment: moncode unused
-3 symbols
+4 symbols
 
 
 
@@ -315,7 +327,7 @@ Symbol: LongueurSon
    Definitions
       At line 4 in file Src\GestionSon.s
    Uses
-      At line 41 in file Src\GestionSon.s
+      At line 42 in file Src\GestionSon.s
 Comment: LongueurSon used once
 PWM_Set_Value_TIM3_Ch3 00000000
 
@@ -329,7 +341,7 @@ External symbols
    Definitions
       At line 18 in file .\Driver\DriverJeuLaser.inc
    Uses
-      At line 58 in file Src\GestionSon.s
+      At line 59 in file Src\GestionSon.s
 Comment: PWM_Set_Value_TIM3_Ch3 used once
 Son 00000000
 
@@ -337,7 +349,7 @@ Symbol: Son
    Definitions
       At line 5 in file Src\GestionSon.s
    Uses
-      At line 48 in file Src\GestionSon.s
+      At line 49 in file Src\GestionSon.s
 Comment: Son used once
 9 symbols
-353 symbols in table
+354 symbols in table

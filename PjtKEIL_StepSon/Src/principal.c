@@ -2,7 +2,7 @@
 
 #include "DriverJeuLaser.h"
 
-#define periode 6552
+#define periode_ech 6552
 #define Periode_ticks 720
 
 extern void CallbackSon(void);
@@ -16,7 +16,7 @@ int main(void)
 
 // Après exécution : le coeur CPU est clocké à 72MHz ainsi que tous les timers
 CLOCK_Configure();
-	Timer_1234_Init_ff( TIM4, periode);
+	Timer_1234_Init_ff( TIM4, periode_ech);
 	Active_IT_Debordement_Timer( TIM4, 2, CallbackSon );
 
 // configuration de PortB.1 (PB1) en sortie push-pull
