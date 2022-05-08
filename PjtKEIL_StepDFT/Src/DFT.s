@@ -21,6 +21,7 @@
 	area    moncode,code,readonly
 ; écrire le code ici		
 DFT_ModuleAuCarre PROC
+	;code 
 	push{lr,r4}
 	ldr r4,=LeSignal  ; l'@ de LeSignal
 	ldr r3,[r4]
