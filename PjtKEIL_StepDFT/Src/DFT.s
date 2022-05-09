@@ -19,16 +19,137 @@
 		
 ;Section ROM code (read only) :		
 	area    moncode,code,readonly
-; écrire le code ici		
-DFT_ModuleAuCarre PROC
+; écrire le code ici	
 	;code 
-	push{lr,r4}
-	ldr r4,=LeSignal  ; l'@ de LeSignal
-	ldr r3,[r4]
-	mov r2,#0x00   ; initialisation de la variable i 
-	ldrsh r1,[r3,r2,lsl #1]
-	add r2,
+;	push{lr,r4}
+;	ldr r4,=LeSignal  ; l'@ de LeSignal
+;	ldr r3,[r4]
+;	mov r2,#0x00   ; initialisation de la variable i 
+;	ldrsh r1,[r3,r2,lsl #1]
+;	add r2,
 	
+	
+	export DFT_ModuleAuCarre
+	export calcul_Img
+	export calcul_Reel
+
+	import LeSignal
+		
+			
+		
+DFT_ModuleAuCarre PROC
+	; r0 contient k
+	; r1 contient @ de signal
+	; r3 contient Re
+	; r2 contient Im
+	push { lr , r0, r1,r4,r5,r6,r7}
+	
+	mov r4, #0x00
+	mov r5, #0x00
+	mov r6, #0x00
+	mov r7, #0x00
+	
+	bl calcul_Reel
+	mov r3,r0   ; r3 prend le contenu de r0 : RE 
+	pop{r0,r1}
+	push {r3}
+	bl  calcul_Img
+	mov r2 , r0   ; r2 contient Im
+	
+	pop{r3}
+
+	smull r4,r5, r3,r3 ; re **2
+
+	smull r6,r7,r2,r2  ; im**2
+	
+	add r5,r7 ; Re²+Im²
+	mov r0,r5
+	pop{ lr }
+	pop{r4,r5,r6,r7}
+	
+
+	bx lr 
+	endp
+
+
+
+
+
+
+calcul_Img proc
+
+	push {r4,r5,r6,r7}
+
+
+	; r0 contient k
+	; r1 contient @Signal 
+	; r2 cotient TabSin
+	; r3 contient x(i) échantillon signal
+	; r4 contient sin(ik)
+	; r5 contient ik
+	; r6 la somme des x(i)*sin(ik)
+	; r7 contient x(i)*sin(ik)
+	; r12 contient i
+	
+	mov r12, #0x00
+	ldr r2, =TabSin ; on met l'@ de TabSin
+	ldr r1,=LeSignal
+
+	b	LOOP
+	endp
+
+
+
+
+calcul_Reel proc
+	
+	push {r4,r5,r6,r7}
+
+	; r0 contient k
+	; r1 contient @Signal 
+	; r2 cotient TabCos
+	; r3 contient x(i) échantillon signal
+	; r4 contient cos(ik)
+	; r5 contient ik
+	; r6 la somme des x(i)*cos(ik)
+	; r7 contient x(i)*cos(ik)
+	; r12 contient i
+	
+	mov r6, #0X00
+	mov r12 , #0X00
+	ldr r2 , = TabCos      ; r2 contient l'@ de TabCos
+	ldr r1,=LeSignal
+	b LOOP
+LOOP
+	;on calcule ik 
+	mul r5, r12,r0 
+	and  r5, #0x3F ; r5 contient ik [64]
+	; on recupere cos ik  ou sin 
+	ldrsh r4 ,[r2, r5, lsl #0X01]
+	;x(i)*cos(ik) ou sin(ik)
+	mul r7, r3, r4 
+	; somme 
+	add r6 , r7
+	; incrementation de i 
+	add r12, #0X01
+	; comparaison entre i et N 
+	cmp r12, #64
+	bne LOOP 
+	; sinon on quite la boucle 
+	; le resultat est stocke dans r6 ON LE MOV TO r0 
+	mov r0,r6
+	b fin 
+	
+fin 
+	pop {r4,r5,r6,r7}
+	bx lr 
+	endp
+
+		
+
+
+
+
 
 
 
