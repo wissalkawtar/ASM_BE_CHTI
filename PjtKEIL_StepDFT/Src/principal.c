@@ -3,7 +3,8 @@
 #include "DriverJeuLaser.h"
 
 	int tab[64];
-	extern int calcul_Reel(int);	
+	extern short int LeSignal[] ;
+	extern int DFT_ModuleAuCarre(int ,short int *);	
 
 
 int main(void)
@@ -18,7 +19,7 @@ CLOCK_Configure();
 	
 
 		for (int k=0; k<64; k++){
-				tab[k]=calcul_Reel(k);
+				tab[k]=DFT_ModuleAuCarre(k,&LeSignal[0]);
 }
 	
 	

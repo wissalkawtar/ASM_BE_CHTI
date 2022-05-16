@@ -29,7 +29,8 @@
 	
 	
 	export DFT_ModuleAuCarre
-	export calcul_Reel_Img
+	export calcul_Img
+	export calcul_Reel
 	import LeSignal
 		
 			
@@ -39,7 +40,7 @@ DFT_ModuleAuCarre PROC
 	; r1 contient @ de signal
 	; r3 contient Re
 	; r2 contient Im
-	push { lr , r4-r7}
+	push { lr , r0, r1,r4,r5,r6,r7}
 	
 	mov r4, #0x00
 	mov r5, #0x00
@@ -48,30 +49,29 @@ DFT_ModuleAuCarre PROC
 	
 	
 	; prépare appel Reel
-	ldr r2, = TabCos      ; r2 contient l'@ de TabCos
-	push {r0,r1}
-	bl calcul_Reel_Img
-	; sauvegarder résultat Reel
+	; bl calcul_ReIm
+	
+	; prépare appel Im
+	; bl calcul_ReIm
+	
+	bl calcul_Reel
 	mov r3,r0   ; r3 prend le contenu de r0 : RE 
 	pop{r0,r1}
 	push {r3}
-	
-	; prépare appel Im
-	ldr r2, =TabSin ; on met l'@ de TabSin
-	bl calcul_Reel_Img
-	
+	bl  calcul_Img
 	mov r2 , r0   ; r2 contient Im
 	
 	pop{r3}
 
 	smull r4,r5, r3,r3 ; re **2
-	smlal r4,r5, r2,r2 ; r4,r5 = r4,r5+r2*r2
-	;smull r6,r7,r2,r2  ; im**2
-	
-	;add r5,r7 ; Re²+Im²
-	mov r0,r5
 
-	pop {lr , r4-r7}
+	smull r6,r7,r2,r2  ; im**2
+	
+	add r5,r7 ; Re²+Im²
+	mov r0,r5
+	pop{ lr }
+	pop{r4,r5,r6,r7}
+	
 
 	bx lr 
 	endp
@@ -79,7 +79,34 @@ DFT_ModuleAuCarre PROC
 
 
 
-calcul_Reel_Img proc
+
+
+calcul_Img proc
+
+	push {r4,r5,r6,r7}
+
+
+	; r0 contient k
+	; r1 contient @Signal 
+	; r2 cotient TabSin
+	; r3 contient x(i) échantillon signal
+	; r4 contient sin(ik)
+	; r5 contient ik
+	; r6 la somme des x(i)*sin(ik)
+	; r7 contient x(i)*sin(ik)
+	; r12 contient i
+	
+	mov r12, #0x00
+	ldr r2, =TabSin ; on met l'@ de TabSin
+	;ldr r1,=LeSignal
+
+	b	LOOP
+	endp
+
+
+
+
+calcul_Reel proc
 	
 	push {r4,r5,r6,r7}
 
@@ -95,7 +122,8 @@ calcul_Reel_Img proc
 	
 	mov r6, #0X00
 	mov r12, #0X00
-
+	ldr r2, = TabCos      ; r2 contient l'@ de TabCos
+	ldr r1,=LeSignal
 	b LOOP
 LOOP
 	;on calcule ik 
