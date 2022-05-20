@@ -1,0 +1,5 @@
+-test signal réel réussi: 
+-- on a testé avec une fréquence de 80khz et on a bien trouvé le pick à k=16
+--on a testé avec un signal carré et une fréquence f=5khz et on a des valeurs à k=1,3,5.. et des 0 partout 
+-début codage du jeu : 
+--les scores s'incrémentent à chaque fois qu'un joueur tire 
